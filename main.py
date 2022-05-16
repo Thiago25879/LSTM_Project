@@ -2,7 +2,7 @@ from tensorflow import keras
 from zipfile import ZipFile
 from sklearn.model_selection import train_test_split
 from keras.models import Sequential
-from keras.layers import Dense, SimpleRNN
+from keras.layers import Dense, LSTM
 from sklearn.metrics import r2_score
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
@@ -40,11 +40,12 @@ while idx_start > 0:
     X_new.append(x_line)
     y_new.append(y_line)
     idx_start = idx_start - 1
-# converting list of lists to numpy array
 
+# converting list of lists to numpy array
 X_new = np.array(X_new)
 y_new = np.array(y_new)
 
+# train test split
 X_train, X_test, y_train, y_test = train_test_split(X_new, y_new, test_size=0.33, random_state=42)
 
 # Reshaping for keras
@@ -57,10 +58,9 @@ X_train_rs = X_train.reshape(n_samples, n_timesteps, n_features)
 X_test_rs = X_test.reshape(X_test.shape[0], n_timesteps, n_features)
 
 random.seed(42)
+batch_size = 32
 simple_model = Sequential([
-    SimpleRNN(32, activation='tanh', input_shape=(n_timesteps, n_features), return_sequences=True),
-    SimpleRNN(32, activation='tanh', return_sequences=True),
-    SimpleRNN(32, activation='tanh'),
+    LSTM(8, activation='tanh',input_shape=(n_timesteps, n_features)),
     Dense(y_train.shape[1]),
 ])
 simple_model.summary()
